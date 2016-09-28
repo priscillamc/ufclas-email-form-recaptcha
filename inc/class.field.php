@@ -28,6 +28,11 @@ class Field {
         $this->value = ( !empty($this->default) )? $this->default : null;
     }
     
+    /**
+     * Display the field
+     * 
+     * @since 1.0.0
+     */
     function display(){
         echo '<p class="form-group' . $this->get_group_classes() . '" id="form-group-' . $this->id . '">';
         echo '<label for="' . $this->id . '" class="control-label">' . $this->title . '</label>';
@@ -36,6 +41,12 @@ class Field {
         echo '</p>';
     }
     
+    /**
+     * Determine form-group classes for required and errors in fields
+     * 
+     * @return string Class names
+     * @since 1.0.0
+     */
     function get_group_classes( $defaults = array() ){
         $classes = $defaults;
         
@@ -48,6 +59,12 @@ class Field {
         return ' ' . join( ' ', $classes );
     }
     
+    /**
+     * Determine form-control attributes for required and errors in fields
+     * 
+     * @return string Attribute text
+     * @since 1.0.0
+     */
     function get_control_attrs( $defaults = array() ){
         $attrs = $defaults;
         
@@ -60,15 +77,27 @@ class Field {
         return ' ' . join( ' ', $attrs );
     }
     
-     function get_help_block( $default_text = '' ){
+    /**
+     * Display help or error text below fields
+     * 
+     * @return string Field description or error
+     * @since 1.0.0
+     */
+    function get_help_block( $default_text = '' ){
         $text = $default_text;
-        
+
         if ( !empty($this->error) ){
             $text .= sprintf( '<span class="help-block" id="help-block-%s">%s</span>', $this->id, $this->error );  
         }
         return $text;
     }
     
+    /**
+     * Sets the field value from POST, only checks for a submitted value
+     * 
+     * @return boolean Whether field value is valid
+     * @since 1.0.0
+     */
     function validate(){
         $this->error = array();
         $this->value = ( isset($_POST[$this->id]) )? trim($_POST[$this->id]) : $this->value;
@@ -86,6 +115,12 @@ class Field {
 
 class Text_Field extends Field {
     
+    /**
+     * Sets the sanitized field value from post, checks if valid
+     * 
+     * @return boolean Whether field value is valid
+     * @since 1.0.0
+     */
     function validate(){
         $valid = parent::validate();
         
@@ -102,6 +137,11 @@ class Textarea_Field extends Field {
         parent::__construct( array_merge( array('type' => 'textarea'), $args ) );
     }
     
+    /**
+     * Display the field
+     * 
+     * @since 1.0.0
+     */
     function display(){
         echo '<p class="form-group' . $this->get_group_classes() . '">';
         echo '<label for="' . $this->id . '" class="control-label">' . $this->title . '</label>';
@@ -110,6 +150,12 @@ class Textarea_Field extends Field {
         echo '</p>';
     }
     
+    /**
+     * Sets the sanitized field value from post, checks if valid
+     * 
+     * @return boolean Whether field value is valid
+     * @since 1.0.0
+     */
     function validate(){
         $valid = parent::validate();
         
@@ -121,6 +167,7 @@ class Textarea_Field extends Field {
             $this->value = strip_tags($this->value);
             $this->value = stripslashes($this->value);
             $this->value = htmlspecialchars($this->value);
+            $this->value = nl2br($this->value);
             return true;
         }
     }
@@ -132,6 +179,12 @@ class Email_Field extends Field {
         parent::__construct( array_merge( array('type' => 'email'), $args ) );
     }
     
+    /**
+     * Sets the sanitized field value from post, checks if valid
+     * 
+     * @return boolean Whether field value is valid
+     * @since 1.0.0
+     */
     function validate(){
         $valid = parent::validate();
         
@@ -171,6 +224,11 @@ class Heading_Field extends Field {
         $this->id = $args['id'];
     }
     
+    /**
+     * Display the field
+     * 
+     * @since 1.0.0
+     */
     function display(){
         $html = sprintf( '<%s>%s</%s>', $this->tag, $this->title, $this->tag );
         
@@ -200,6 +258,11 @@ class Checkbox_Field extends Field {
         parent::__construct( array_merge( $fieldset_args, $args ) );
     }
     
+    /**
+     * Display the field
+     * 
+     * @since 1.0.0
+     */
     function display(){
         $required_txt = ($this->required)? ' required':'';
 		echo '<fieldset class="form-group" id="form-group-' . $this->id . '">';
@@ -257,6 +320,11 @@ class File_Field extends Field {
         parent::__construct( $file_args );
     }
     
+    /**
+     * Display the field
+     * 
+     * @since 1.0.0
+     */
     function display(){
         $required_txt = ($this->required)? ' required':'';
         $multiple_txt = ($this->multiple)? ' multiple':'';
@@ -268,6 +336,11 @@ class File_Field extends Field {
         echo '</p>';
     }
     
+    /**
+     * Uploads selected file to the path
+     * 
+     * @since 1.0.0
+     */
     function upload(){
         if ( $_FILES[$this->id]['error'] == UPLOAD_ERR_OK ){
             
@@ -279,6 +352,111 @@ class File_Field extends Field {
                 return 'Error: File not uploaded.';
             }
         }
+    }
+}
+
+class Captcha_Field extends Field {
+    public $url;
+    public $sitekey;
+    public $secret;
+    
+    function __construct( $args = array() ){
+        
+        $defaults = array(
+            'title' => 'File Upload',
+            'type' => '',
+            'id' => '',
+            'default' => false,
+            'required' => true,
+            'url' => '',
+            'sitekey' => '',
+            'secret' => '',
+        );
+        
+        $field_args = array_merge( $defaults, $args );
+        $this->url = $field_args['url'];
+        $this->sitekey = $field_args['sitekey'];
+        $this->secret = $field_args['secret'];
+        parent::__construct( $field_args );
+    }
+    
+    /**
+     * Display the field
+     * 
+     * @since 1.1.0
+     */
+    function display(){
+        echo '<div class="form-group' . $this->get_group_classes() . '" id="form-group-' . $this->id . '">';
+        echo '<p class="control-label">' . $this->title . '</p>';
+        echo '<div class="g-recaptcha" data-sitekey="' . $this->sitekey . '"></div>';
+        echo $this->get_help_block();
+        echo '</div>';
+    }
+    
+    /**
+     * Sets the sanitized field value from post, checks if valid
+     * 
+     * @return boolean Whether field value is valid
+     * @since 1.1.0
+     */
+    function validate(){
+        $valid = parent::validate();
+        
+        if(!$valid){
+           return false; 
+        }
+        
+        // Use a query string for the request
+        $data = array(
+            'secret' => $this->secret,
+            'response' => $this->value,
+        );
+        $data = http_build_query( $data, '', '&' );
+
+        // Post to the Google reCAPTCHA API
+        $curl = curl_init( $this->url );
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data );
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded') );
+        curl_setopt($curl, CURLINFO_HEADER_OUT, false);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_FAILONERROR, true);
+        $response = curl_exec($curl);
+        $curl_error = curl_error($curl);
+        curl_close($curl);
+
+        // Check for curl response errors
+        if ( $response !== false && !empty($response) ){
+            
+            $this->error = ''; // Reset the error message
+            
+            $response_data = json_decode( $response, true );
+            $valid = ( $response_data['success'] ); // Check the API response
+            
+            if ( !$valid ){
+                // Error messages for API response codes
+                $error_messages = array(
+                    'missing-input-secret' => 'A verification parameter is missing. Contact your site administrator.',
+                    'invalid-input-secret' => 'A verification parameter is invalid. Contact your site administrator.',
+                    'missing-input-response' => 'Missing required verification.',
+                    'invalid-input-response' => 'Invalid verification response.',
+                );
+                if ( isset($response_data['error-codes']) ){
+                    foreach ( $response_data['error-codes'] as $error_code ){
+                        $this->error .= 'Error: ' . $error_messages[$error_code];
+                    }   
+                }
+            }
+        }
+        else{
+            $this->error = (empty($curl_error))? 'Problem verifying form submission.' : $curl_error;
+            $this->error = 'Error: ' . $this->error;
+            $valid = false;
+        }
+        
+        return $valid;
     }
 }
 

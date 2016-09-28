@@ -4,3 +4,5 @@ Thumbs.db
 .sass-cache
 *.orig
 .DS_Store
+test_message_*
+test_api.php

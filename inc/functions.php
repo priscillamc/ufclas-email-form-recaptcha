@@ -3,10 +3,10 @@
 Project Name: UF CLAS Custom Form-to-Email
 Project URI: http://it.clas.ufl.edu/
 Description: Sends a form to email then redirect to a confirmation page. Avoids spam and multiple submissions.
-Version: 1.0.0
+Version: 1.1.0
 Author: Priscilla Chapman (CLAS IT)
 Author URI: http://it.clas.ufl.edu/
-Build Date: 20130927
+Build Date: 20130928
 License: GPL2
 */
 
@@ -15,22 +15,31 @@ define('PROJECT_NAME', 'Call for Proposals' );
 define('PROJECT_DEBUG', false );
 define('HOME_PATH', dirname( dirname(__FILE__) ) ); // No trailing slash
 define('HOME_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/' . basename(dirname($_SERVER['PHP_SELF'])) );
+define('FORM_CAPTCHA_SITEKEY', '6Lf1UAcUAAAAADPggsA_poVLfN0CkqOlsymfGRsr' );
+define('FORM_CAPTCHA_SECRET', '6Lf1UAcUAAAAAL4-r_Rt_wOn5qiPI9We-8H0FPQ6' );
+define('FORM_EMAIL_ADMIN_NAME', 'Center for the Humanities and the Public Sphere' );
+define('FORM_EMAIL_ADMIN_EMAIL', 'humanities-center@ufl.edu' );
+define('FORM_EMAIL_SUBJECT', 'Public Humanities Statement of Intent 2016-2017' );
 
 include HOME_PATH . '/inc/class.form.php';
 include HOME_PATH . '/inc/class.field.php';
+include HOME_PATH . '/inc/class.email_message.php';
 
-$admin_email = array(
-    'to' => 'Center for the Humanities and the Public Sphere <humanities-center@ufl.edu>',
-    'subject' => 'Submission: Public Humanities Statement of Intent 2016-2017',
-    'message' => "Submission of letter of intent to the Public Humanities funding program at the UF Center for the Humanities and the Public Sphere:\n\nFORM_FIELDS",
-);
+// Set email message defaults
+$admin_email = new Email_Message( array(
+    'to' => sprintf('%s <%s>', FORM_EMAIL_ADMIN_NAME, FORM_EMAIL_ADMIN_EMAIL),
+    'from' => '',
+    'subject' => "Submission: " . FORM_EMAIL_SUBJECT,
+    'excluded_fields' => array('submit', 'g-recaptcha-response'),
+) );
+$confirm_email = new Email_Message( array(
+    'to' => '',
+    'from' => sprintf('%s <%s>', FORM_EMAIL_ADMIN_NAME, FORM_EMAIL_ADMIN_EMAIL),
+    'subject' => "Confirmation: " . FORM_EMAIL_SUBJECT,
+    'excluded_fields' => array('submit', 'g-recaptcha-response'),
+) );
 
-$confirm_email = array(
-    'from' => 'Center for the Humanities and the Public Sphere <humanities-center@ufl.edu>',
-    'subject' => 'Confirmation: Public Humanities Statement of Intent 2016-2017',
-    'message' => "Submission of letter of intent to the Public Humanities funding program at the UF Center for the Humanities and the Public Sphere:\n\nFORM_FIELDS",
-);
-
+// Set form fields
 $email_fields = array(
     new Text_Field( array(
         'title' => 'University of Florida Co-Applicant Name(s) and Affiliation(s)',
@@ -69,12 +78,18 @@ $email_fields = array(
         'id' => '04description',
         'required' => true,
     )),
+    new Captcha_Field( array(
+        'title' => 'Verification',
+        'id' => 'g-recaptcha-response',
+        'url' => 'https://www.google.com/recaptcha/api/siteverify',
+        'sitekey' => FORM_CAPTCHA_SITEKEY,
+        'secret' => FORM_CAPTCHA_SECRET,
+    )),
 );
 
 $email_form = new Form( array(
     'id' => 'email-form',
     'action' => HOME_URL . '/index.php',
-    'captcha' => '6Lf1UAcUAAAAADPggsA_poVLfN0CkqOlsymfGRsr',
     'fields' => $email_fields,
 ));
 
