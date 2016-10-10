@@ -86,5 +86,16 @@ class Form {
         }
         return false;
     }
+    
+    function get_sender_email(){
+        $emails = array();
+        
+        foreach ( $this->fields as $field ){
+            if ( ('Email_Field' == get_class($field)) && $field->send_email ){
+                $emails[] = $field->value;
+            }
+        }
+        return join('; ', $emails);
+    }
 }
 ?>

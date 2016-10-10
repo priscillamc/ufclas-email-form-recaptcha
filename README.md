@@ -23,18 +23,30 @@ Usage
 
 Note: Contact CLAS IT before making edits to any of the PHP files.
 
+### How to set the fields in the form
+
+Open and edit `$email_form` in `inc/functions.php`. The fields types and arguments are in the `inc/class.field.php` file.
+
 ### How to Change the Text above the Form or the Confirmation Page
 
 Open and edit the following files to change the HTML that appears on the pages: 
 
-- content/form.html - displayed above the form on the index page.
-- content/confirmation.html - displayed on the confirmation page.
+- Text_Field
+- Textarea_Field
+- Email_Field
+- Heading_Field
+- Checkbox_Field
+- Radio_Field*
+- Captcha_Field* 
+- File_Field*
+
+Note: Radio, checkbox, and file upload fields are not fully implemented.
 
 ### How to Change the Email Message Text
 
 Open and edit the following file to change the body of the email message: 
 
-- content/email_message.html
+- content/email_message.php
 
 The comment `<!--{FORM_FIELDS}-->`displays the form submission data when the email is sent. Do not remove this comment for the admin email message.
 
@@ -50,4 +62,6 @@ Changelog
 
 To-Do List
 ----------
-
+- Add Radio field
+- Add Checkbox field
+- Add File field 

@@ -1,4 +1,4 @@
-* {
+/** {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -59,15 +59,10 @@ label {
 .form-fields {
     margin-bottom: 15px;
 }
-.control-label {
-    font-weight: bold;
-}
+
 textarea.form-control {
     height: auto;
     min-height: 200px;
-}
-.is-required .control-label:after {
-    content: ' *';
 }
 .has-error .control-label {
     color: #a94442;
@@ -93,4 +88,15 @@ textarea.form-control {
     color: #a94442;
     background-color: rgba(255, 255, 255, 0.25);
     border-color: rgba(0, 0, 0, 0.25);
+}
+*/
+#page {
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+.control-label {
+    font-weight: bold;
+}
+.is-required .control-label:after {
+    content: ' *';
 }

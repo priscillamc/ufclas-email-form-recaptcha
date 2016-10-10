@@ -33,7 +33,7 @@ class Email_Message {
     function set_message( $fields = array() ){
         $message = $this->message;
         $message_fields = '';
-        $email_file = HOME_PATH . '/content/email_message.html';
+        $email_file = FORM_PROJECT_PATH . '/content/email_message.php';
         
         // If no message, check the content file
         if ( empty( $this->message ) ){
@@ -72,6 +72,11 @@ class Email_Message {
      * @since 1.1.0
      */
     function send_email( $form = null ) {
+        if ( empty($this->to) || empty($this->from) ){
+            $this->sent = false;
+            return;
+        }
+        
         // Set email headers
 		$headers = "From: {$this->from}" . "\r\n";
 		$headers .= "Reply-To: {$this->from}" . "\r\n";
@@ -84,7 +89,7 @@ class Email_Message {
         }
         
         // Log message or send email
-        if( $_SERVER['HTTP_HOST'] == 'localhost' ){
+        if( FORM_DEBUG ){
             $test_message = '<pre>Subject: ' . $this->subject . '<br>';
             $test_message .= 'To: ' . htmlspecialchars($this->to) . '<br>';
             $test_message .= htmlspecialchars($headers) . "</pre><br><br>";

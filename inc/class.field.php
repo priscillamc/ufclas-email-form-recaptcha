@@ -174,9 +174,17 @@ class Textarea_Field extends Field {
 }
 
 class Email_Field extends Field {
+    public $send_email;
     
     function __construct( $args = array() ){
-        parent::__construct( array_merge( array('type' => 'email'), $args ) );
+        $defaults = array(
+            'type' => 'email',
+            'send_email' => false,
+        );
+       
+        $field_args = array_merge( $defaults, $args );
+        $this->send_email = $field_args['send_email'];
+        parent::__construct( $field_args );
     }
     
     /**
@@ -268,7 +276,7 @@ class Checkbox_Field extends Field {
 		echo '<fieldset class="form-group" id="form-group-' . $this->id . '">';
         echo '<legend>' . $this->title . '</legend>';
         foreach($this->items as $value => $label) {
-          	$selected = $this->get_value( true );
+          	$selected = $this->value;
 			if($this->type == 'checkbox'){
 				$checked = '';
 				$item_name = $this->id . '[]';
@@ -281,7 +289,7 @@ class Checkbox_Field extends Field {
 				$item_name = $this->id;
 			}
             $item_id = $this->id . '-' . $value;
-            echo '<div class="' . $this->type . '"><label>';
+            echo '<div class="' . $this->type . '"><label> ';
             echo '<input name="' . $item_name . '" type="' . $this->type . '" id="' . $item_id . '" value="' . $value . '"' . $checked . '>';
             echo $label . '</label></div>';
         }
@@ -374,7 +382,7 @@ class Captcha_Field extends Field {
         );
         
         $field_args = array_merge( $defaults, $args );
-        $this->url = $field_args['url'];
+        $this->url = ( !FORM_DEBUG )? $field_args['url'] : FORM_PROJECT_URL . '/inc/test_api.php';
         $this->sitekey = $field_args['sitekey'];
         $this->secret = $field_args['secret'];
         parent::__construct( $field_args );
@@ -390,7 +398,6 @@ class Captcha_Field extends Field {
         echo '<p class="control-label">' . $this->title . '</p>';
         echo '<div class="g-recaptcha" data-sitekey="' . $this->sitekey . '"></div>';
         echo $this->get_help_block();
-        echo '</div>';
     }
     
     /**
@@ -402,7 +409,7 @@ class Captcha_Field extends Field {
     function validate(){
         $valid = parent::validate();
         
-        if(!$valid){
+        if(!$valid) {
            return false; 
         }
         
