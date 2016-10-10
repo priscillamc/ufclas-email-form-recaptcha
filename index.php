@@ -3,7 +3,7 @@
 Project Name: UF CLAS PHP Email CAPTCHA Form
 Project URI: https://it.clas.ufl.edu/
 Description: Sends form submission and confirmation messages then redirects to a confirmation page. Uses Google reCAPTCHA API to avoid spam submissions.
-Version: 2.0.0
+Version: 2.0.1
 Author: Priscilla Chapman (CLAS IT)
 Author URI: https://it.clas.ufl.edu/
 Build Date: 20161010

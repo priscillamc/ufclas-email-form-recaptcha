@@ -4,6 +4,7 @@
 define('FORM_PROJECT_NAME', 'Project Name' );
 define('FORM_PROJECT_PATH', dirname( dirname(__FILE__) ) ); // No trailing slash
 define('FORM_PROJECT_URL', get_project_url()  );
+define('FORM_SITE_URL', '' );
 define('FORM_CAPTCHA_SITEKEY', '' );
 define('FORM_CAPTCHA_SECRET', '' );
 define('FORM_EMAIL_ADMIN_NAME', 'Site Admin' );
